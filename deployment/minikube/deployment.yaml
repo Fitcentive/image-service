@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-service
+  labels:
+    app: image-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-service
+  template:
+    metadata:
+      labels:
+        app: image-service
+    spec:
+      containers:
+        - name: image-service
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+          image: image-service:1.0
+          imagePullPolicy: Never
+          command: ["entrypoint.sh"]
+          args: ["-token" ,"fbsxIBmBRNff6d97jwnFfWADhFWCs3fA", "-upload_limit", "4950996300" ,"/opt/media"]
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "1024Mi"
+              cpu: "250m"
+          ports:
+            - name: http-port
+              containerPort: 25478
+          livenessProbe:
+            httpGet:
+              path: /files/status.png?token=fbsxIBmBRNff6d97jwnFfWADhFWCs3fA
+              port: http-port
+            initialDelaySeconds: 60
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /files/status.png?token=fbsxIBmBRNff6d97jwnFfWADhFWCs3fA
+              port: http-port
+            initialDelaySeconds: 60
+            periodSeconds: 3
+          env:
+            - name: BUCKET
+              value: fitcentive-upload-images
+            - name: MOUNT
+              value: /opt/media
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: |
+                {
+                  "type": "service_account",
+                  "project_id": "fitcentive-1210",
+                  "private_key_id": "e1346f2071e3a482abd2e84b9bca8ca318859d19",
+                  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQC2SaMfd5i8UUHe\nv12ZFpqktyGhTKniZnIheYD/Cqz1m70lS6fkhoL6plthSK+UlaPPiteFIiidQwk0\nz1ZvzzExpQQWBhMcGkBbCERnFwQ2WTkKzJbblYuOTTfgsBrKojgRCge7z0DzYo3Q\nwMIy6I4CuXTxjkyij3+oNzNdncJ72rFIDYvmmGneQ2+qGKCy5LYO2uNjgR+qmCN6\np3JYkpC3piRvG/q+3vkPM+w9ecOWviByATzVttvDDOESnLpf0tSt7syAiBnT62gS\n3kvUlGCWGu9VkDEfqHTLfZc+JrfRLAagviDBxwqanhUBj3AZcgAeXKhnoeARVW+X\nZC4cqTdRAgMBAAECgf8hDpMmaB0RCZG7poVMXdNtfq7HZL+27unqAb7PtLMcJA7V\n1JwXaGblGlLRl/zY7soZUqecdrVaArrvEl3HQpIJQeoCLgsJINMxSJTr0DpTVAE9\nx096qR2SkMfkinGEjcAQVvrpp1jmY9j6VZQVTb1zGqHtrE1f4LLY+1zofTnnruxF\n+SjzdqJqWiKbyxdoq+Bd6pXQyFyTR4q17iZ5d4QIHVAkBH981h931Fi2Ka5vUk6+\n0pLCCXHCmuHgUJBptRPcFzQfRQx33Pb5gBZaScsBQL8N1MiMLQtIeDzKLVFsIGyQ\nOH8bs3gLJz4I3JgpahscT92o9RTiATrQeGVLIMkCgYEA4sml7sdFBXWYQgKqb1AE\nTK9tMPGq/daZpUc2r5hTZ/b9Qee7rnnwT9vgI5TwsiM56p8AsQ4fTT13mttH0or3\nU9qjzYzjNWvHzYQyfgnwxO1Rnxfn5ahxgSWATRCl4hyUewi2yDPLTBpijcxxYXPq\n7PlZ3gBccu7YlcdvGl9swHkCgYEAzcSYOz90jtj1V4Dy8uzM6r9HXIWW2AfgnxC3\na7y0qsJsQcJZDcqZ9WkUA29F+IMUCVdQ844wA3DFJuNkrK0snYsX6lcvmVdkoNQR\nVqqnN1Ze4aQ1h4zxyzTe/F/hBAdVzqW0k8/BJK60pOnTURobCRSlLYoFXpN3rkgr\nD82l55kCgYAevh8UQ0cD+nDtYdcgx8QNcSpoHBqF1nV1hjXPj+KekUi7imJSwIzn\nBnNX33TRcR0ExREe7z8nBVIVV+xgih4E6/qQfqy+LSIkpesCUu6kg1cxLdhttWvN\nifvedodGI4GtO/0rHnpMkrcRaclk4IXUIekgwwPFQMNzalmRRaZEYQKBgCErA27p\nd5xfFI0aWA8YZJ+iXZpoXjxMaMS7KRXQwT6VQGYJMdmrQs3wNi2njhvU5THsRTw9\nOzgSwXTXSq8a6woqFZzMmPuavrm99V2G/JVK8thkY8yJx5/90cPUoKzJkedRhp4c\n6wFCuBOtLUbxclIwZb/Fc8Ae/Te2olpVx9xhAoGAGEHc8yLDq0uGX7oNXo8fRnvK\nxd1iJ4aZIFJj1tAueRfCn1Ukh05m80mo6gUzEg+DHnp0FNZ8FJHHXnyzFoqEV1fr\nqnSGH/uPIFsYN4vjEQqpqmT48pqNBtASg3JCy7j2G6S5Jwx8yG/J+wawe3Ih0E5Z\nGzvzEaRZmIEgN3jRibo=\n-----END PRIVATE KEY-----\n",
+                  "client_email": "image-service@fitcentive-1210.iam.gserviceaccount.com",
+                  "client_id": "115207476590731402325",
+                  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                  "token_uri": "https://oauth2.googleapis.com/token",
+                  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/image-service%40fitcentive-1210.iam.gserviceaccount.com"
+                }

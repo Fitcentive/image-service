@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: image-service
+spec:
+  selector:
+    app: image-service
+  ports:
+    - protocol: TCP
+      port: 10260
+      targetPort: http-port
