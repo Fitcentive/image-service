@@ -214,3 +214,12 @@ services:
     networks:
       - proxy
 ```
+
+---
+
+## Deploy to Minikube
+
+1. `docker build -t image-service:latest -t image-service:1.0 .`
+2. Go to Google console for Cloud Storage, and create the following bucket - `fitcentive-upload-images`
+3. Ensure `/status.png` file exists in bucket root
+4. `kubectl apply -f deployment/minikube`

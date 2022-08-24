@@ -1,3 +1,5 @@
+# Image allows subdirectory upload - https://github.com/mayth/go-simple-upload-server/pull/31/files
+# Image stored in GCS with the help of gcsfuse
 FROM execmd/go-simple-upload-server AS build-env
 
 FROM alpine:3.16 AS runtime-env
